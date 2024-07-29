@@ -1,41 +1,67 @@
-const formData = { email: "", message: "" };
-const form = document.querySelector('.feedback-form');
+import iziToast from "izitoast";
+import "izitoast/dist/css/iziToast.min.css";
+import imageUrl from '../img/alert-icon.svg'
+import resolveImageUrl from '../img/resolve-icon.svg'
 
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const savedData = localStorage.getItem('feedback-form-state');
-      if (savedData) {
-        const parsedData = JSON.parse(savedData);
-        formData.email = parsedData.email || "";
-        formData.message = parsedData.message || "";
-        form.elements.email.value = formData.email;
-        form.elements.message.value = formData.message;
-      }
-    });
+const form = document.querySelector('.form');
+// console.log(form);
 
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
 
-    form.addEventListener('input', event => {
-      if (event.target.name === 'email' || event.target.name === 'message') {
-        formData[event.target.name] = event.target.value;
-        localStorage.setItem('feedback-form-state', JSON.stringify(formData));
-      }
-    });
+  const myFormData = new FormData(form);
+  console.log(myFormData);
 
+  const delay = event.target.delay.value;
+  const status = event.target.state.value
 
-    form.addEventListener('submit', event => {
-      event.preventDefault();
-
-
-      if (formData.email.trim() === "" || formData.message.trim() === "") {
-        alert('Fill please all fields');
+  const promise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (status === 'fulfilled') {
+        resolve(delay);
       } else {
-
-        console.log(formData);
-
-
-        localStorage.removeItem('feedback-form-state');
-        formData.email = "";
-        formData.message = "";
-        form.reset();
+        reject(delay)
       }
+    }, delay);
+  });
+
+   
+  promise
+    .then(delay => {
+      iziToast.success({
+        message: `Fulfilled promise in ${delay}ms`,
+        messageSize: '16',
+        messageColor: '#fff',
+        backgroundColor: '#59a10d',
+        position: 'topRight',
+        close: true,
+        closeOnEscape: true,
+        closeOnClick: true,
+        progressBar: true,
+        progressBarColor: '#326101',
+        iconColor: '#fff',
+                     iconUrl: resolveImageUrl,
+      });
+      
+    })
+    .catch(delay => {
+      iziToast.error({
+         message: `Rejected promise in ${delay}ms`,
+        messageSize: '16',
+        messageColor: '#fff',
+        backgroundColor: '#ef4040',
+        position: 'topRight',
+        close: true,
+        closeOnEscape: true,
+        closeOnClick: true,
+        progressBar: true,
+        progressBarColor: '#ffbebe',
+        iconUrl: imageUrl,
+               iconColor: '#fff',
+      });
     });
+  
+  console.log(promise);
+
+});
